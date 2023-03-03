@@ -6,6 +6,9 @@ const jwt = require("jsonwebtoken");
 const {check, validationResult} = require("express-validator");
 const router = new Router()
 const authMiddleware = require("../middleware/auth.middleware")
+const adService = require("../services/adService")
+const Ad = require("../models/Ad")
+
 
 
 router.post('/registration', 
@@ -32,6 +35,7 @@ router.post('/registration',
         const hashPassword = await bcrypt.hash(password, 7)
         const user = new User({name, lastname, email, password: hashPassword})
         await user.save()
+        await adService.createDir(new Ad({user:user.id, name: ""}))
         return res.json({message: "Пользователь был успешно создан :3"})
 
     } catch (error) {

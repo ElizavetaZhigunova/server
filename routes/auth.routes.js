@@ -1,13 +1,12 @@
-const Router = require("express");
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const config = require("config");
-const jwt = require("jsonwebtoken");
-const {check, validationResult} = require("express-validator");
+import Router from "express";
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import config from "config";
+import jwt from "jsonwebtoken";
+import {check, validationResult} from "express-validator";
 const router = new Router()
-const authMiddleware = require("../middleware/auth.middleware")
-const adService = require("../services/adService")
-const Ad = require("../models/Ad")
+import {authMiddleware} from "../middleware/auth.middleware.js"
+
 
 
 
@@ -27,15 +26,14 @@ router.post('/registration',
         
         const {name, lastname, email, password} = req.body
 
-        const candidate = await User.findOne({email})
+        const candidate = await UserModel.findOne({email})
 
         if(candidate) {
             return res.status(400).json({message: `Пользователь с почтой ${email} был создан. Авторизуйтесь, пожалуйста :3`})
         }
         const hashPassword = await bcrypt.hash(password, 7)
-        const user = new User({name, lastname, email, password: hashPassword})
+        const user = new UserModel({name, lastname, email, password: hashPassword})
         await user.save()
-        await adService.createDir(new Ad({user:user.id, name: ""}))
         return res.json({message: "Пользователь был успешно создан :3"})
 
     } catch (error) {
@@ -100,4 +98,4 @@ router.get('/auth', authMiddleware,
 })
 
 
-module.exports = router
+export default router

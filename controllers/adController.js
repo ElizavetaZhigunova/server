@@ -1,30 +1,127 @@
-const adService = require("../services/adService")
-const User = require("../models/User")
-const Ad = require("../models/Ad")
+import AdModel from '../models/Ad.js'
 
+export const getLastCategory = async (req, res) => {
+  try {
+    const ads = await AdModel.find().limit(5).exec();
 
-class AdController {
-    async createDir(req, res) {
-        try {
-            const {name, parent} = req.body
-            const ad = new Ad({name, parent, user: User.id})
-            const parentAd = await Ad.findOne({__id: parent})
-            if(!parentAd) {
-                ad.path = name
-                await adService.createDir(ad)
-            } else {
-                ad.path = `${parentAd.path} \\ ${ad.name}`
-                await adService.createDir(ad)
-                parentAd.childs.push(ad.__id)
-                await parentAd.save()
-            }
-            await parentAd.save()
-            return res.json(ad)
-        } catch (error) {
-            console.log(error)
-            return res.status(400).json(error)
-        }
+    const category = ads
+      .map((obj) => obj.category)
+      .flat()
+
+    res.json(category);
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: 'Не удалось получить объявления',
+    });
+  }
+};
+
+export const getAll = async (req, res) => {
+    try {
+        const ads = await AdModel.find().populate('user').exec();
+        res.json(ads)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Не удалось получить статьи"
+        })
     }
 }
 
-module.exports = new AdController()
+export const getOne = async (req, res) => {
+    try {
+        const adId = req.params.id
+        
+        AdModel.findOneAndUpdate(
+            {
+              _id: adId,
+            },
+            {
+              $inc: { viewsCount: 1 },
+            },
+            {
+              returnDocument: 'after',
+            }
+          )
+            .then((doc) => {
+              res.json(doc);
+            })
+            .catch((err) => {
+              console.log(err);
+              res.status(404).json({ message: 'Объявление не найдено' });
+            });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Не удалось получить объявления"
+        })
+    }
+}
+
+export const remove = async (req, res) => {
+    AdModel.findByIdAndDelete(req.params.id)
+      .then(() => {
+        res.send({ message: 'Ad deleted successfully.' });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send({ message: 'Error deleting ad.' });
+      });
+  };
+        
+
+export const create = async (req, res) => {
+    try {
+        const doc = new AdModel({
+            name: req.body.name,
+            photo: req.body.photo,
+            category: req.body.category,
+            price: req.body.price,
+            priceDay: req.body.priceDay,
+            priceWeek: req.body.priceWeek,
+            priceMonth: req.body.priceMonth,
+            city: req.body.city,
+            address: req.body.address,
+            user: req.userId
+        })
+
+        const ad = await doc.save()
+
+        res.json(ad)
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            message: "Не удалось создать объявление"
+        })
+    }
+}
+
+export const update = async (req, res) => {
+    try {
+        const adId = req.params.id
+       await AdModel.updateOne({
+            _id: adId
+        }, {
+            name: req.body.name,
+            photo: req.body.photo,
+            category: req.body.category,
+            price: req.body.price,
+            priceDay: req.body.priceDay,
+            priceWeek: req.body.priceWeek,
+            priceMonth: req.body.priceMonth,
+            city: req.body.city,
+            address: req.body.address,
+        })
+      .then(() => {
+        res.send({ message: 'Ad updated successfully.' });
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send({ message: 'Error updating ad.' });
+      });
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({message: "Не удалось обновить объявление"})
+    }
+}

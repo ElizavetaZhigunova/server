@@ -1,7 +1,9 @@
-const {Schema, model, ObjectId} = require("mongoose");
+import {Schema, model} from "mongoose";
 
-const Ad = new Schema({
-    idUser: {type: String},
+const AdSchema = new Schema({
+    user: {type: Schema.Types.ObjectId,
+        ref: 'User',
+        },
     name: {type: String, required: true},
     photo: {type: String, required: true},
     category: {type: String, required: true},
@@ -11,9 +13,14 @@ const Ad = new Schema({
     priceMonth: {type: String, required: true},
     city: {type: String, required: true},
     address: {type: String, required: true},
-    user: {type: ObjectId, ref: 'User'},
-    parent: {type: ObjectId, ref: "Ad"},
-    childs: {type: ObjectId, ref: "Ad"}
+    viewsCount: {
+        type: Number,
+        default: 0
+    },
+},
+{
+    timestamps: true,
+
 })
 
-module.exports = model('Ad', Ad)
+export default model('Ad', AdSchema)

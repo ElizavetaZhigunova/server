@@ -5,6 +5,7 @@ import {authRouter} from "./routes/index.js";
 import cors from "./middleware/cors.middleware.js";
 
 import {AdController, UserController} from './controllers/index.js'
+import checkAuth from "./checkAuth.js";
 
 const app = express()
 const PORT = config.get('serverPort')
@@ -12,7 +13,7 @@ const PORT = config.get('serverPort')
 app.use(cors)
 app.use(express.json())
 // app.use('/api/auth', authRouter)
-app.post('/AddNew', AdController.create)
+app.post('/AddNew', checkAuth, AdController.create)
 app.get('/AddNew', AdController.getAll)
 app.get('/AddNew/:id', AdController.getOne)
 app.delete('/AddNew/:id', AdController.remove)

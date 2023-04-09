@@ -5,8 +5,7 @@ const User = new Schema({
     lastname: {type: String, required: true},
     email: {type: String, required: true},
     password: {type: String, required: true},
-    avatar: {type: String},
-    ad: {type: String, default: 0}
+    avatar: {type: String}
 })
 
 export default model('User', User)

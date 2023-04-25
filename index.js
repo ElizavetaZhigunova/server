@@ -6,6 +6,7 @@ import cors from "./middleware/cors.middleware.js";
 
 import {AdController, UserController} from './controllers/index.js'
 import checkAuth from "./checkAuth.js";
+import { authMiddleware } from "./middleware/auth.middleware.js";
 
 const app = express()
 const PORT = config.get('serverPort')
@@ -13,7 +14,7 @@ const PORT = config.get('serverPort')
 app.use(cors)
 app.use(express.json())
 // app.use('/api/auth', authRouter)
-app.post('/AddNew', checkAuth, AdController.create)
+app.post('/AddNew', authMiddleware, AdController.create)
 app.get('/AddNew', AdController.getAll)
 app.get('/AddNew/:id', AdController.getOne)
 app.delete('/AddNew/:id', AdController.remove)
@@ -24,7 +25,7 @@ app.get('/AddNew/category', AdController.getLastCategory)
 
 app.post('/registration', UserController.register);
 app.post('/login', UserController.login)
-app.get('/auth', UserController.auth)
+app.get('/auth', authMiddleware, UserController.auth)
 
 const start = async () => {
     try {
@@ -34,7 +35,7 @@ const start = async () => {
             console.log('Server started on port ', PORT)
         })
     } catch (error) {
-        
+        consolr.log(error)
     }
 }
 

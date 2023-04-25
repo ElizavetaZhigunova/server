@@ -24,7 +24,7 @@ router.post('/registration',
             return res.status(400).json({message: "Uncorrect request", errors})
         }
         
-        const {name, lastname, email, password} = req.body
+        const {name, lastname, phone, email, password,  ad} = req.body
 
         const candidate = await UserModel.findOne({email})
 
@@ -32,7 +32,7 @@ router.post('/registration',
             return res.status(400).json({message: `Пользователь с почтой ${email} был создан. Авторизуйтесь, пожалуйста :3`})
         }
         const hashPassword = await bcrypt.hash(password, 7)
-        const user = new UserModel({name, lastname, email, password: hashPassword})
+        const user = new UserModel({name, lastname, phone, email, password: hashPassword,  ad})
         await user.save()
         return res.json({message: "Пользователь был успешно создан :3"})
 
@@ -62,6 +62,7 @@ router.post('/login',
             user: {
                 id: user.id,
                 name: user.name,
+                phone: user.phone,
                 lastname: user.lastname,
                 email: user.email,
                 avatar: user.avatar,
@@ -84,6 +85,7 @@ router.get('/auth', authMiddleware,
             token,
             user: {
                 id: user.id,
+                phone: user.phone,
                 name: user.name,
                 lastname: user.lastname,
                 email: user.email,

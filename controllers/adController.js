@@ -83,7 +83,7 @@ export const create = async (req, res) => {
             priceMonth: req.body.priceMonth,
             city: req.body.city,
             address: req.body.address,
-            user: req.userId
+            user: req.user.id
         })
 
         const ad = await doc.save()

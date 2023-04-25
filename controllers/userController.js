@@ -14,15 +14,15 @@ export const register = async (req, res) => {
             return res.status(400).json({message: "Uncorrect request", errors})
         }
         
-        const {name, lastname, email, password} = req.body
-
+        const {name, lastname, email, password, phone} = req.body
+console.log(name, '\\' , lastname, '\\' , email, '\\' , password, '\\' , phone)
         const candidate = await User.findOne({email})
 
         if(candidate) {
             return res.status(400).json({message: `Пользователь с почтой ${email} был создан. Авторизуйтесь, пожалуйста :3`})
         }
         const hashPassword = await bcrypt.hash(password, 7)
-        const user = new User({name, lastname, email, password: hashPassword})
+        const user = new User({name, lastname, email, password: hashPassword, phone})
         await user.save()
         return res.json({message: "Пользователь был успешно создан :3"})
 
@@ -50,6 +50,7 @@ export const login =async (req, res) => {
             user: {
                 id: user.id,
                 name: user.name,
+                phone: user.phone,
                 lastname: user.lastname,
                 email: user.email,
                 avatar: user.avatar,
@@ -72,6 +73,7 @@ export const auth = async (req, res) => {
             user: {
                 id: user.id,
                 name: user.name,
+                phone: user.phone,
                 lastname: user.lastname,
                 email: user.email,
                 avatar: user.avatar,

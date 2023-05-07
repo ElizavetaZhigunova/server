@@ -87,6 +87,7 @@ export const create = async (req, res) => {
         })
 
         const ad = await doc.save()
+        console.log(ad)
 
         res.json(ad)
     } catch (error) {
